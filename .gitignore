@@ -1,0 +1,47 @@
+# __pycache__ & Python build artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.ipynb_checkpoints/
+
+# Large model caches / binary predictions (>100 MB exceeds GitHub limit)
+*.npz
+*.pth
+*.pt
+*.ckpt
+
+# Manuscript & private submission files (kept local during peer review)
+latex/
+arxiv_submission/
+arxiv_submission.zip
+
+# Third-party reference figures used only for visual layout inspection
+Chen_2025_Advanced_Science_Fig1.jpg
+Li_IEEE_TMI_SCDM_Fig1.png
+Xu_IEEE_TBME_DMSL_Fig2.pdf
+Xu_IEEE_TBME_DMSL_Fig2.png
+
+# Legacy v1 figures, candidate drafts & HTML previews
+results/figures/*.png
+results/figures/*.pdf
+results/figures/*.svg
+results/figures/*.drawio
+results/figures/candidates*/
+results/figures/figgenie_library_style/
+results/figures/figgenie_nvc_flow/
+results/figures/figgenie_study_overview/
+results/figures/figgenie_exemplar_adapted/
+results/figures/nvc_figgenie/
+results/figures/figgenie_monochrome/*.preview.html
+results/figures/figgenie_monochrome/*.lint.*
+results/figures/figgenie_monochrome/fig.final.svg
+results/figures/figgenie_monochrome/brief.md
+results/figures/figgenie_monochrome/caption.md
+results/figures/figgenie_monochrome/plan.md
+results/figures/figgenie_monochrome/spec.json
+
+# OS & editor files
+.DS_Store
+Thumbs.db
+*.tmp
