@@ -24,7 +24,8 @@
 
 ## 2. Experiment 2: Nested LOSO Screening & BH-FDR Exploratory Clinical Associations
 - **Strict Outer-Fold Closed-Form NVC (Zero Stacking)**: AUC = `0.824` (95% CI `[0.665, 0.956]`), Nested Acc = `81.1%` (Sens `70.0%`, Spec `94.1%`, BalAcc `82.1%`), Paired ΔAUC vs EEG-Only boot $p = 0.0890$.
-- **Nested 37-fold LOSO NVC Biomarkers (Blind EB-NVC-Net)**: AUC = `0.685` (95% CI `[0.503, 0.850]`), Nested Acc = `64.9%` (Sens `55.0%`, Spec `76.5%`, BalAcc `65.7%`).
+- **Nested 37-fold LOSO combined NVC features (includes measured HbO)**: AUC = `0.685` (95% CI `[0.503, 0.850]`), Nested Acc = `64.9%` (Sens `55.0%`, Spec `76.5%`, BalAcc `65.7%`).
+- **Nested LOSO HbO-Only**: AUC = `0.674` (95% CI `[0.476, 0.853]`), Nested Acc = `75.7%`, Paired Closed-Form ΔAUC vs HbO-Only = `+0.150` (boot $p = 0.0910$).
 - **Nested LOSO EEG-Only**: AUC = `0.579` (95% CI `[0.388, 0.765]`), Paired ΔAUC boot $p = 0.3580$.
 
 ## 3. Experiment 3: Strictly In-Fold 6-Step MI Decoding & Placebo Controls (HEFMI-ICH)

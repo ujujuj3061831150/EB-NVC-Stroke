@@ -871,6 +871,7 @@ def compute_nested_loso_and_clinical(bio_df: pd.DataFrame, records: List[Subject
             "clean_gain", "hbo_peak", "alpha_mean", "alpha_abs_asym",
             "tau_mean", "tau_abs_asym", "res_mean", "hbo_abs_asym",
         ],
+        "HbO-Only Features": ["hbo_peak", "hbo_std", "hbo_abs_asym"],
         "EEG-Only Features": ["clean_x_std", "clean_u_std", "alpha_mean", "tau_abs_asym", "res_mean"],
     }
 
@@ -1043,6 +1044,14 @@ def compute_nested_loso_and_clinical(bio_df: pd.DataFrame, records: List[Subject
         "ci_hi": float(np.percentile(diff_auc_st, 97.5)),
         "paired_bootstrap_p": max(p_auc_st, 1.0 / 2001.0),
     }
+    diff_auc_hbo = roc_out["Strict Outer-Fold Closed-Form NVC"]["boot_aucs"] - roc_out["HbO-Only Features"]["boot_aucs"]
+    p_auc_hbo = float(2.0 * min(np.mean(diff_auc_hbo <= 0), np.mean(diff_auc_hbo >= 0)))
+    nested_stats["paired_delta_auc_vs_hbo"] = {
+        "delta": float(roc_out["Strict Outer-Fold Closed-Form NVC"]["auc"] - roc_out["HbO-Only Features"]["auc"]),
+        "ci_lo": float(np.percentile(diff_auc_hbo, 2.5)),
+        "ci_hi": float(np.percentile(diff_auc_hbo, 97.5)),
+        "paired_bootstrap_p": max(p_auc_hbo, 1.0 / 2001.0),
+    }
 
     # Exploratory Clinical Correlations (ICH n=20) with Spearman, Partial Spearman (Age+LesionSide), and BH-FDR
     ich = bio_df[bio_df["is_patient"] == 1].copy()
@@ -1149,6 +1158,7 @@ def write_final_report(metrics: dict, out_path: str) -> None:
         "## 2. Experiment 2: Nested LOSO Screening & BH-FDR Exploratory Clinical Associations",
         f"- **Strict Outer-Fold Closed-Form NVC (Zero Stacking)**: AUC = `{exp2['nested_loso']['Strict Outer-Fold Closed-Form NVC']['auc']:.3f}` (95% CI `[{exp2['nested_loso']['Strict Outer-Fold Closed-Form NVC']['auc_ci_lo']:.3f}, {exp2['nested_loso']['Strict Outer-Fold Closed-Form NVC']['auc_ci_hi']:.3f}]`), Nested Acc = `{exp2['nested_loso']['Strict Outer-Fold Closed-Form NVC']['nested_acc']*100:.1f}%` (Sens `{exp2['nested_loso']['Strict Outer-Fold Closed-Form NVC']['sensitivity']*100:.1f}%`, Spec `{exp2['nested_loso']['Strict Outer-Fold Closed-Form NVC']['specificity']*100:.1f}%`, BalAcc `{exp2['nested_loso']['Strict Outer-Fold Closed-Form NVC']['nested_balanced_acc']*100:.1f}%`), Paired ΔAUC vs EEG-Only boot $p = {exp2['nested_loso']['paired_delta_auc_strict']['paired_bootstrap_p']:.4f}$.",
         f"- **Nested 37-fold LOSO combined NVC features (includes measured HbO)**: AUC = `{exp2['nested_loso']['NVC Biomarkers']['auc']:.3f}` (95% CI `[{exp2['nested_loso']['NVC Biomarkers']['auc_ci_lo']:.3f}, {exp2['nested_loso']['NVC Biomarkers']['auc_ci_hi']:.3f}]`), Nested Acc = `{exp2['nested_loso']['NVC Biomarkers']['nested_acc']*100:.1f}%` (Sens `{exp2['nested_loso']['NVC Biomarkers']['sensitivity']*100:.1f}%`, Spec `{exp2['nested_loso']['NVC Biomarkers']['specificity']*100:.1f}%`, BalAcc `{exp2['nested_loso']['NVC Biomarkers']['nested_balanced_acc']*100:.1f}%`).",
+        f"- **Nested LOSO HbO-Only**: AUC = `{exp2['nested_loso']['HbO-Only Features']['auc']:.3f}` (95% CI `[{exp2['nested_loso']['HbO-Only Features']['auc_ci_lo']:.3f}, {exp2['nested_loso']['HbO-Only Features']['auc_ci_hi']:.3f}]`), Nested Acc = `{exp2['nested_loso']['HbO-Only Features']['nested_acc']*100:.1f}%`, Paired Closed-Form ΔAUC vs HbO-Only = `{exp2['nested_loso']['paired_delta_auc_vs_hbo']['delta']:+.3f}` (boot $p = {exp2['nested_loso']['paired_delta_auc_vs_hbo']['paired_bootstrap_p']:.4f}$).",
         f"- **Nested LOSO EEG-Only**: AUC = `{exp2['nested_loso']['EEG-Only Features']['auc']:.3f}` (95% CI `[{exp2['nested_loso']['EEG-Only Features']['auc_ci_lo']:.3f}, {exp2['nested_loso']['EEG-Only Features']['auc_ci_hi']:.3f}]`), Paired ΔAUC boot $p = {exp2['nested_loso']['paired_delta_auc']['paired_bootstrap_p']:.4f}$.",
         "",
         "## 3. Experiment 3: Strictly In-Fold 6-Step MI Decoding & Placebo Controls (HEFMI-ICH)",
@@ -1176,6 +1186,11 @@ def main() -> None:
         action="store_true",
         help="Regenerate Fig. 1-3 directly from saved route_a_metrics.json and subject_nvc_biomarkers.csv without re-running decoding permutations.",
     )
+    parser.add_argument(
+        "--update-exp2",
+        action="store_true",
+        help="Recompute only Experiment 2 nested LOSO / clinical correlations (keeping saved Exp 1/3) and regenerate Fig. 1-3.",
+    )
     args = parser.parse_args()
 
     os.makedirs(FIG_DIR, exist_ok=True)
@@ -1185,20 +1200,34 @@ def main() -> None:
     with open(metrics_path, "r", encoding="utf-8") as f:
         metrics = json.load(f)
 
-    if args.figures_only:
+    if args.figures_only or args.update_exp2:
         required = ("experiment_1_v2", "experiment_2_v2", "experiment_3_verified")
         missing = [k for k in required if k not in metrics]
         if missing:
             raise RuntimeError(f"Missing saved v2 metrics {missing} in {metrics_path}; run without --figures-only first.")
         _, rep_wave = compute_reconstruction_benchmark(records)
-        roc_data, _, _ = compute_nested_loso_and_clinical(bio_df, records)
+        roc_data, exp2_new, _ = compute_nested_loso_and_clinical(bio_df, records)
+        if args.update_exp2:
+            metrics["experiment_2_v2"] = exp2_new
+            with open(metrics_path, "w", encoding="utf-8") as f:
+                json.dump(metrics, f, indent=2)
+            rep_path = os.path.join(RESULTS_DIR, "route_a_report.md")
+            sec4_tail = ""
+            if os.path.exists(rep_path):
+                old_rep = open(rep_path, "r", encoding="utf-8").read()
+                if "## 4. Experiment 4:" in old_rep:
+                    sec4_tail = "\n## 4. Experiment 4:" + old_rep.split("## 4. Experiment 4:", 1)[1]
+            write_final_report(metrics, rep_path)
+            if sec4_tail:
+                with open(rep_path, "a", encoding="utf-8") as f:
+                    f.write(sec4_tail)
         recon_res = metrics["experiment_1_v2"]
         exp2_v2 = metrics["experiment_2_v2"]
         dec_res = metrics["experiment_3_verified"]
         plot_fig1_pathology(records, bio_df, recon_res, os.path.join(FIG_DIR, "fig1_nvc_pathology_comparison.png"))
         plot_fig2_clinical(bio_df, roc_data, exp2_v2, os.path.join(FIG_DIR, "fig2_lesion_asymmetry_clinical.png"))
         plot_fig3_recon_and_decoding(recon_res, rep_wave, dec_res, os.path.join(FIG_DIR, "fig3_virtual_hbo_decoding.png"))
-        print("Regenerated fig1-fig3 (.png/.pdf) from saved v2 metrics (--figures-only).")
+        print(f"Regenerated fig1-fig3 (.png/.pdf) (update_exp2={args.update_exp2}).")
         return
 
     recon_res, rep_wave = compute_reconstruction_benchmark(records)

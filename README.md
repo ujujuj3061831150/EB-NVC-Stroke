@@ -1,7 +1,7 @@
 # Empirical-Bayes Neurovascular Dynamics & Fast-Slow Envelope Manifold Analysis (N = 84)
 
 Reference implementation and reproducible evaluation pipeline for:
-**"Empirical-Bayes Neurovascular Dynamics and Fast-Slow Envelope Manifold Analysis Across Hemorrhagic EEG-fNIRS and Pure-EEG Ischemic Stroke Cohorts"**
+**"Empirical-Bayes Neurovascular Coupling Inversion and Fast-Slow Envelope Manifold Analysis Across Hemorrhagic EEG-fNIRS and Pure-EEG Ischemic Stroke Cohorts"**
 
 ## Repository Structure
 
@@ -14,7 +14,7 @@ Reference implementation and reproducible evaluation pipeline for:
 ├── train_eval_route_a.py          # Stage 1: 37-fold blind LOSO PyTorch training -> predictions & biomarkers
 ├── finalize_route_a.py            # Stage 2: HEFMI-ICH audit, nested LOSO, BH-FDR, 200-perm & Fig. 2-4
 ├── eval_cross_stroke_84.py        # Stage 3: Liu2024 (n=47) + N=84 stratified cohorts & Fig. 5
-├── publication_figures.py         # IEEE TBME double-column vector figure generator
+├── publication_figures.py         # Publication vector figure generator (Fig. 1-4; ABME)
 └── results/
     ├── route_a_metrics.json       # Complete quantitative results & 95% CIs across all experiments
     ├── fold_manifest.json         # Deterministic CV & block-split indices for reproducibility
@@ -41,8 +41,8 @@ Both datasets analyzed in this study are publicly available and de-identified by
    - Per-trial $0\text{--}1\,\mathrm{s}$ optical baseline subtraction eliminates inter-trial tail spillover on `HEFMI-ICH`.
    - Bad-channel repair ($\sigma_c > 5.0 \cdot \mathrm{median}_j \sigma_j$) and MAD clipping ($[-8, 8]$) on `HEFMI-ICH`, trace-normalized SPD covariances on `Liu2024`, shrinkage Euclidean Alignment ($\bar{\mathbf{R}}_{\mathrm{reg}} = 0.85\bar{\mathbf{R}}_{\mathrm{tr}} + 0.15\frac{\mathrm{tr}(\bar{\mathbf{R}}_{\mathrm{tr}})}{C}\mathbf{I}$), CSP filters, ANOVA `SelectKBest`, scalers, and shrinkage LDA/logistic classifiers are fitted strictly inside each training or calibration fold $\mathcal{I}_{\mathrm{tr}}$.
 3. **Explicit Path Separation & Outer-Fold Screening**:
-   - Separates blind cross-subject LOSO (`EB-NVC-Net`), matched 8-trial calibrated MAP estimation (`EB-NVC`, evaluated on held-out trials $8\text{--}29$ with calibration-only top-25% channel selection), and in-fold optical-free `FastSlow-NVC` decoding ($N = 84$).
-   - Clinical screening reports both combined NVC features including measured HbO ($\mathrm{AUC} = 0.685$) and outer-fold closed-form NVC screening with zero Stage-1 cross-subject stacking ($\mathrm{AUC} = 0.824$, nested accuracy $81.1\%$).
+   - Separates blind cross-subject LOSO (`EB-NVC-Net`), matched 8-trial damped Empirical-Bayes calibration (`EB-NVC`, evaluated on held-out trials $8\text{--}29$ with calibration-only top-25% channel selection), and in-fold optical-free `FastSlow-NVC` decoding ($N = 84$).
+   - Clinical screening reports combined NVC features including measured HbO ($\mathrm{AUC} = 0.685$), HbO-only screening ($\mathrm{AUC} = 0.674$), and outer-fold closed-form NVC screening with zero Stage-1 cross-subject stacking ($\mathrm{AUC} = 0.824$, nested accuracy $81.1\%$).
 
 ## Reproduction Commands
 

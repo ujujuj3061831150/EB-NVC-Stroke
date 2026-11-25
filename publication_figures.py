@@ -299,7 +299,7 @@ def plot_fig1_pathology(records, bio_df, recon_res, out_path):
         xticklabels=["Healthy\n(n = 17)", "ICH\n(n = 20)"],
         ylabel=r"$\hat{R}_{\mathrm{amp}}$",
     )
-    sig_bracket(a, 0, 1, 0.395, 0.015, r"$P = 1.31 \times 10^{-4}$", fs=7.4)
+    sig_bracket(a, 0, 1, 0.395, 0.015, r"$p = 1.31 \times 10^{-4}$", fs=7.4)
     add_ieee_label(a, "a", "NVC ratio", x_offset_pt=-32)
 
     # (b) Normalized EEG amplitude (log y-axis handles 5.86 outlier without compressing main cluster)
@@ -318,7 +318,7 @@ def plot_fig1_pathology(records, bio_df, recon_res, out_path):
     b.yaxis.set_major_locator(FixedLocator([0.6, 1, 2, 4, 6]))
     b.yaxis.set_major_formatter(StrMethodFormatter("{x:g}"))
     b.yaxis.set_minor_locator(NullLocator())
-    sig_bracket(b, 0, 1, 6.4, 0.65, r"$P = 0.0154$", fs=7.4)
+    sig_bracket(b, 0, 1, 6.4, 0.65, r"$p = 0.0154$", fs=7.4)
     add_ieee_label(b, "b", "EEG amplitude", x_offset_pt=-28)
 
     # (c) Normalized HbO amplitude
@@ -334,7 +334,7 @@ def plot_fig1_pathology(records, bio_df, recon_res, out_path):
         xticklabels=["Healthy\n(n = 17)", "ICH\n(n = 20)"],
         ylabel="HbO / healthy mean",
     )
-    sig_bracket(c, 0, 1, 1.88, 0.07, r"$P = 0.0100$", fs=7.4)
+    sig_bracket(c, 0, 1, 1.88, 0.07, r"$p = 0.0100$", fs=7.4)
     add_ieee_label(c, "c", "HbO amplitude", x_offset_pt=-28)
 
     # (d) Hemodynamic time course
@@ -398,6 +398,7 @@ def plot_fig2_clinical(bio_df, roc_data, nested_res, out_path):
     for key, name, color, ls in [
         ("Strict Outer-Fold Closed-Form NVC", "Closed-form", TEAL, "-"),
         ("NVC Biomarkers", "Combined NVC", PURPLE, "-."),
+        ("HbO-Only Features", "HbO only", ORANGE, ":"),
         ("EEG-Only Features", "EEG only", GRAY, "--"),
     ]:
         curve = roc_data[key]
@@ -417,7 +418,16 @@ def plot_fig2_clinical(bio_df, roc_data, nested_res, out_path):
         color=TEAL,
         arrowprops=dict(arrowstyle="-", color=TEAL, lw=0.55, shrinkA=0, shrinkB=3),
     )
-    a.legend(loc="lower right", bbox_to_anchor=(0.99, 0.03), labelspacing=0.30, fontsize=7.2)
+    a.legend(
+        loc="lower right",
+        bbox_to_anchor=(1.00, 0.02),
+        labelspacing=0.24,
+        fontsize=6.9,
+        frameon=True,
+        facecolor="white",
+        edgecolor="none",
+        framealpha=0.88,
+    )
     a.set(
         xlim=(0.0, 1.02),
         ylim=(0.0, 1.02),
@@ -458,7 +468,7 @@ def plot_fig2_clinical(bio_df, roc_data, nested_res, out_path):
     b.set_xticks(range(3))
     b.set_xticklabels(["mRS", "MBI", "FMA-UE"])
     b.set_yticks(range(4))
-    b.set_yticklabels(["Mean delay", "Ipsi. residual", "NVC ratio", "Delay asym."])
+    b.set_yticklabels(["Mean centroid", "Ipsi. residual", "NVC ratio", "Basis-shift asym."])
     b.tick_params(length=0, pad=2)
     b.set_xticks(np.arange(-0.5, 3, 1), minor=True)
     b.set_yticks(np.arange(-0.5, 4, 1), minor=True)
@@ -489,9 +499,9 @@ def plot_fig2_clinical(bio_df, roc_data, nested_res, out_path):
         xticklabels=["1\n(n=10)", "2\n(n=0)", "3\n(n=5)", "4\n(n=5)"],
         yticks=[-10, 0, 10],
         xlabel="mRS grade",
-        ylabel="Delay (ms)",
+        ylabel="Basis shift (ms)",
     )
-    sig_bracket(c, 1.0, 3.5, 14.5, 1.4, r"1 vs 3–4: $P = 0.045$", fs=7.1)
+    sig_bracket(c, 1.0, 3.5, 14.5, 1.4, r"1 vs 3–4: $p = 0.045$", fs=7.1)
     add_ieee_label(c, "c", "mRS in ICH", x_offset_pt=-54, y_offset_pt=6)
 
     # (d) MBI in ICH with Theil-Sen robust regression (avoids single-point OLS distortion)
@@ -536,7 +546,7 @@ def plot_fig2_clinical(bio_df, roc_data, nested_res, out_path):
         ylim=(0.0, 106.0),
         xticks=[-10, 0, 10],
         yticks=[0, 25, 50, 75, 100],
-        xlabel="Delay asymmetry (ms)",
+        xlabel="Basis-shift asymmetry (ms)",
         ylabel="MBI",
     )
     add_ieee_label(d, "d", "MBI in ICH", x_offset_pt=-28)
@@ -754,7 +764,7 @@ def plot_fig3_recon_and_decoding(recon_res, rep_wave, decoding_res, out_path):
             label=name,
         )
     d.legend(loc="lower left", bbox_to_anchor=(0.0, 1.02), ncol=3, columnspacing=0.65, handlelength=1.3, fontsize=7.2)
-    d.text(7.92, 61.3, r"$*\,P_{\mathrm{Bonf}}=0.032$", ha="right", va="bottom", fontsize=7.2, color=TEAL)
+    d.text(7.92, 61.3, r"$*\,p_{\mathrm{Bonf}}=0.032$", ha="right", va="bottom", fontsize=7.2, color=TEAL)
     d.set(
         xlim=(1.5, 8.5),
         ylim=(46.0, 64.5),
@@ -792,7 +802,7 @@ def plot_fig4_cross_stroke(liu_sum, liu_df, strata, out_path):
     a.set_ylim(-5.5, 9.5)
     a.set_yticks([-5, 0, 5])
     a.set_xlabel("Decoding step")
-    sig_bracket(a, 1.0, 4.0, 5.2, 0.55, r"$+3.14\ \mathrm{pp}\ (P_t=0.040)$", fs=7.0)
+    sig_bracket(a, 1.0, 4.0, 5.2, 0.55, r"$+3.14\ \mathrm{pp}\ (p_t=0.040)$", fs=7.0)
     add_ieee_label(a, "a", "Liu2024 component gain", x_offset_pt=-32, y_offset_pt=16)
 
     # (b) Forest plot across N=84

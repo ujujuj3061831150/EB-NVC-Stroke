@@ -10947,6 +10947,17 @@
         "mean_youden_threshold": 0.6090832853273837,
         "std_youden_threshold": 0.057765288617445086
       },
+      "HbO-Only Features": {
+        "auc": 0.6735294117647059,
+        "auc_ci_lo": 0.47647058823529415,
+        "auc_ci_hi": 0.8529411764705883,
+        "nested_acc": 0.7567567567567568,
+        "nested_balanced_acc": 0.7573529411764706,
+        "sensitivity": 0.75,
+        "specificity": 0.7647058823529411,
+        "mean_youden_threshold": 0.574552438324565,
+        "std_youden_threshold": 0.019947767940307354
+      },
       "EEG-Only Features": {
         "auc": 0.5794117647058823,
         "auc_ci_lo": 0.3882352941176471,
@@ -10980,6 +10991,12 @@
         "ci_lo": -0.038235294117647034,
         "ci_hi": 0.4970588235294117,
         "paired_bootstrap_p": 0.089
+      },
+      "paired_delta_auc_vs_hbo": {
+        "delta": 0.1499999999999999,
+        "ci_lo": -0.020588235294117577,
+        "ci_hi": 0.33529411764705885,
+        "paired_bootstrap_p": 0.091
       }
     },
     "clinical_ich_fdr": {
