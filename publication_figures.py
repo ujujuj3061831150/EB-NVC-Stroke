@@ -687,7 +687,7 @@ def plot_fig3_recon_and_decoding(recon_res, rep_wave, decoding_res, out_path):
     # Significance bracket between Canonical (y=2) and EB-NVC (y=0)
     bx_r = 0.068
     ax_r.plot([bx_r, bx_r + 0.004, bx_r + 0.004, bx_r], [2, 2, 0, 0], color=BLACK, lw=0.6)
-    ax_r.text(bx_r + 0.006, 1.0, "*\n0.013", va="center", ha="left", fontsize=7.0, color=BLACK)
+    ax_r.text(bx_r + 0.006, 1.0, "*\n0.0127", va="center", ha="left", fontsize=6.6, color=BLACK)
 
     ax_rmse.set(xlim=(0.50, 1.24), xticks=[0.6, 0.8, 1.0], yticklabels=[])
     ax_rmse.set_title(r"Top-25% RMSE ($\mu$M)", fontsize=8.0, pad=3.0)
@@ -872,10 +872,10 @@ def plot_fig4_cross_stroke(liu_sum, liu_df, strata, out_path):
         ylabel="EEG peak (s)",
     )
     c.text(
-        0.04, 0.05,
+        0.04, 0.25,
         r"$\rho_{\mathrm{part}}=-0.46^*$" + "\n" + r"$q=0.0165$",
         transform=c.transAxes,
-        fontsize=7.1,
+        fontsize=7.0,
         color=BLACK,
         va="bottom",
         ha="left",
