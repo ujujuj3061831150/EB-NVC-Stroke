@@ -14,7 +14,7 @@ Reference implementation and reproducible evaluation pipeline for:
 ├── train_eval_route_a.py          # Stage 1: 37-fold blind LOSO PyTorch training -> predictions & biomarkers
 ├── finalize_route_a.py            # Stage 2: HEFMI-ICH audit, nested LOSO, BH-FDR, 200-perm & Fig. 2-4
 ├── eval_cross_stroke_84.py        # Stage 3: Liu2024 (n=47) + N=84 stratified cohorts & Fig. 5
-├── publication_figures.py         # Publication vector figure generator (Fig. 1-4; ABME)
+├── publication_figures.py         # Publication vector figure generator (manuscript Figs. 2-5; ABME)
 └── results/
     ├── route_a_metrics.json       # Complete quantitative results & 95% CIs across all experiments
     ├── fold_manifest.json         # Deterministic CV & block-split indices for reproducibility
